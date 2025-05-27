@@ -1,45 +1,117 @@
 import { Tabs } from 'expo-router';
-import React from 'react';
-import { Platform } from 'react-native';
+import { Feather, FontAwesome5, MaterialIcons , Ionicons} from '@expo/vector-icons';
+import React, { useState, useLayoutEffect } from 'react';
+import { useRouter, useNavigation } from 'expo-router';
+import {MaterialCommunityIcons} from '@expo/vector-icons';
 
-import { HapticTab } from '@/components/HapticTab';
-import { IconSymbol } from '@/components/ui/IconSymbol';
-import TabBarBackground from '@/components/ui/TabBarBackground';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+    const router = useRouter();
+    const navigation = useNavigation();
+
+    useLayoutEffect(() => {
+    navigation.setOptions({ headerShown: false });
+  }, [navigation]);
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
-          },
-          default: {},
-        }),
-      }}>
+        tabBarActiveTintColor: 'rgb(83, 67, 63)',
+        tabBarInactiveTintColor: '#AA9183',
+        tabBarStyle: { backgroundColor: 'rgb(236, 228, 223)',
+      borderTopWidth: 0, // elimină border-ul de sus
+      elevation: 0,      // pentru Android, elimină umbra
+      shadowOpacity: 0,  },
+      }}
+    >
       <Tabs.Screen
-        name="index"
+        name="closet/closet"
+        
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          title: 'Closet',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="wardrobe" color={color} size={28} />
+          ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="add"
+        
+        options={{
+          title: 'Add',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="add-circle" color={color} size={30} />
+          ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="profile/personalInformation"
+        options={{
+          href: null,
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="profile/changeLoginMethod"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          href: null,
         }}
       />
+      <Tabs.Screen
+        name="profile/profileSettings"
+        options={{
+          href: null,
+        }}
+      />
+      
+      <Tabs.Screen
+        name="closet/addClothes"
+        options={{
+          href: null,
+        }}
+      />
+
+      <Tabs.Screen
+        name="closet/addOutfits"
+        options={{
+          href: null,
+        }}
+      />
+
+      <Tabs.Screen
+        name="outfits"
+        options={{
+          title: 'Feed',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="grid-outline" size={size} color={color} />
+          ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="addItems"
+        options={{
+          title: 'Add Items',
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="add-circle-outline" color={color} size={30} />
+          ),
+        }}
+      />
+ 
+
+        <Tabs.Screen
+        name="profile"
+        
+        options={{
+          title: ' My Profile',
+          tabBarIcon: ({ color, size }) => (
+            <FontAwesome5 name="user-alt" color={color} size={22} />
+          ),
+        }}
+      />
+
     </Tabs>
   );
 }
