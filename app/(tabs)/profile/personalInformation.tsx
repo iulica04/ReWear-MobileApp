@@ -1,6 +1,6 @@
-
-import { API_BASE_URL } from '../../config';import React, { useLayoutEffect, useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, ScrollView, Modal, Pressable, TextInput, Alert } from 'react-native';
+import { API_BASE_URL } from '../../config';
+import React, { useLayoutEffect, useEffect, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, ScrollView, KeyboardAvoidingView, Modal, Pressable, TextInput, Alert , Platform} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons, MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { useRouter, useNavigation } from 'expo-router';
@@ -33,6 +33,7 @@ export default function PersonalInformationScreen() {
 
   // Pentru pop-up schimbare parolă
   const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
   const [passwordError, setPasswordError] = useState('');
@@ -126,12 +127,7 @@ export default function PersonalInformationScreen() {
         setShowConfirmPasswordModal(false);
       } else {
         const errorResponse = await response.text();
-        if (errorResponse.includes('Invalid password') || errorResponse.includes('Password')) {
-          setConfirmPasswordError('Invalid password.');
-        } else {
-          setConfirmPasswordError('Could not update. Try again.');
-        }
-        
+        setConfirmPasswordError(errorResponse || 'Could not update. Try again.');
       }
     } catch (err) {
       setConfirmPasswordError('Could not update. Try again.');
@@ -140,6 +136,7 @@ export default function PersonalInformationScreen() {
 
   // Deschide modal pentru schimbare parolă
   const handleChangePassword = () => {
+    setOldPassword('');
     setNewPassword('');
     setConfirmNewPassword('');
     setPasswordError('');
@@ -154,8 +151,8 @@ export default function PersonalInformationScreen() {
     if (password.length < 6 || password.length > 50) {
       return 'Password must be between 6 and 50 characters.';
     }
-    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,}$/.test(password)) {
-      return 'Password must contain at least one uppercase letter, one lowercase letter, and one number.';
+    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d]).{6,}$/.test(password)) {
+      return 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.';
     }
     if (password !== confirmPassword) {
       return 'Passwords do not match.';
@@ -171,32 +168,43 @@ export default function PersonalInformationScreen() {
       return;
     }
     if (!user) return;
+    if (!oldPassword) {
+      setPasswordError('Please enter your current password.');
+      return;
+    }
 
     try {
       const jwtToken = await AsyncStorage.getItem('jwtToken');
-      const updatedUser = {
-        id : user.id,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        userName: user.userName,
-        email: user.email,
-        loginProvider: user.loginProvider,
-        password: newPassword,
+      const body = {
+        userId: user.id,
+        oldPassword: oldPassword,
+        newPassword: newPassword,
       };
-      const response = await fetch(`${API_BASE_URL}/api/Users/${user.id}`, {
+      const response = await fetch(`${API_BASE_URL}/api/Users/update-password/${user.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${jwtToken}`,
         },
-        body: JSON.stringify(updatedUser),
+        body: JSON.stringify(body),
       });
       if (response.ok) {
         setShowPasswordModal(false);
+        setOldPassword('');
+        setNewPassword('');
+        setConfirmNewPassword('');
         Alert.alert('Success', 'Password changed successfully!');
       } else {
-   
-        setPasswordError('Could not update password. Try again.');
+        const errorData = await response.json().catch(() => ({}));
+        if (
+          errorData.message &&
+          (errorData.message.toLowerCase().includes('old password') ||
+            errorData.message.toLowerCase().includes('invalid'))
+        ) {
+          setPasswordError('Current password is incorrect.');
+        } else {
+          setPasswordError(errorData.message || 'Current password is incorrect.');
+        }
       }
     } catch (err) {
       setPasswordError('Could not update password. Try again.');
@@ -381,43 +389,63 @@ export default function PersonalInformationScreen() {
 
       {/* Password Modal */}
       <Modal
-        visible={showPasswordModal}
-        animationType="fade"
-        transparent
-        onRequestClose={() => setShowPasswordModal(false)}
-      >
-        <View style={styles.snsModalOverlay}>
-          <View style={styles.snsModalContent}>
-            <View style={styles.snsModalIconContainer}>
-              <Ionicons name="lock-closed" size={48} color="#D9B9AB" />
-            </View>
-            <Text style={styles.snsModalTitle}>Change Password</Text>
-            <TextInput
-              style={styles.input}
-              value={newPassword}
-              onChangeText={setNewPassword}
-              placeholder="New password"
-              secureTextEntry
-            />
-            <TextInput
-              style={styles.input}
-              value={confirmNewPassword}
-              onChangeText={setConfirmNewPassword}
-              placeholder="Confirm new password"
-              secureTextEntry
-            />
-            {passwordError ? (
-              <Text style={{ color: '#900909', marginBottom: 8 }}>{passwordError}</Text>
-            ) : null}
-            <Pressable style={styles.snsModalOkButton} onPress={handleSavePassword}>
-              <Text style={styles.snsModalOkButtonText}>Change</Text>
-            </Pressable>
-            <Pressable style={styles.snsModalChangeButton} onPress={() => setShowPasswordModal(false)}>
-              <Text style={styles.snsModalChangeButtonText}>Cancel</Text>
-            </Pressable>
+  visible={showPasswordModal}
+  animationType="fade"
+  transparent
+  onRequestClose={() => setShowPasswordModal(false)}
+>
+  <View style={styles.snsModalOverlay}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={10}
+      style={{ width: '100%', alignItems: 'center', justifyContent: 'center' }}
+    >
+      <View style={[styles.snsModalContent, ]}>
+        <ScrollView
+        style={{ width: '100%' }}
+          contentContainerStyle={{ alignItems: 'center', justifyContent: 'center', paddingBottom: 20 }}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.snsModalIconContainer}>
+            <Ionicons name="lock-closed" size={48} color="#D9B9AB" />
           </View>
-        </View>
-      </Modal>
+          <Text style={styles.snsModalTitle}>Change Password</Text>
+          <TextInput
+            style={styles.input}
+            value={oldPassword}
+            onChangeText={setOldPassword}
+            placeholder="Current password"
+            secureTextEntry
+          />
+          <TextInput
+            style={styles.input}
+            value={newPassword}
+            onChangeText={setNewPassword}
+            placeholder="New password"
+            secureTextEntry
+          />
+          <TextInput
+            style={styles.input}
+            value={confirmNewPassword}
+            onChangeText={setConfirmNewPassword}
+            placeholder="Confirm new password"
+            secureTextEntry
+          />
+          {passwordError ? (
+            <Text style={{ color: '#900909', marginBottom: 8 }}>{passwordError}</Text>
+          ) : null}
+          <Pressable style={styles.snsModalOkButton} onPress={handleSavePassword}>
+            <Text style={styles.snsModalOkButtonText}>Change</Text>
+          </Pressable>
+          <Pressable style={styles.snsModalChangeButton} onPress={() => setShowPasswordModal(false)}>
+            <Text style={styles.snsModalChangeButtonText}>Cancel</Text>
+          </Pressable>
+        </ScrollView>
+      </View>
+    </KeyboardAvoidingView>
+  </View>
+</Modal>
 
       {/* SNS Modal */}
       <Modal

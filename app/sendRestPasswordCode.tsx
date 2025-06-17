@@ -50,16 +50,21 @@ export default function SendResetPasswordCodeScreen() {
 
       if (response.ok) {
         Alert.alert(
-          'Email trimis',
-          'Verifică-ți emailul pentru codul de resetare.',
+          'Email sent',
+          'Check your email for the reset code.',
           [{ text: 'OK', onPress: () => router.push({ pathname: '/verifyCode', params: { email } }) }]
         );
       } else {
-        const errorData = await response.json().catch(() => ({}));
-        Alert.alert('Eroare', errorData.message || response.statusText);
+        console.log('Error response:', response);
+        if(response.status === 404) {
+          Alert.alert('Error', 'Email not found.');
+        }
+         else {
+          Alert.alert('Error', 'Failed to send reset code. Please try again later.');
+         }
       }
     } catch (error) {
-      Alert.alert('Eroare', String(error));
+      Alert.alert('Error', String(error));
     }
   };
 

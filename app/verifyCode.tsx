@@ -52,7 +52,7 @@ export default function VerifyCodeScreen() {
 
   const handleVerify = async () => {
     if (!email) {
-      Alert.alert('Eroare', 'Emailul lipsește.');
+      Alert.alert('Error', 'Emailul lipsește.');
       return;
     }
     if (code.some(c => c === '')) {
@@ -72,16 +72,16 @@ export default function VerifyCodeScreen() {
 
       if (response.ok) {
         Alert.alert(
-          'Cod validat!',
-          'Codul a fost verificat cu succes.',
+          'Code verified!',
+          'The code has been successfully verified.',
           [{ text: 'OK', onPress: () => router.push({ pathname: '/resetPassword', params: { email } }) }]
         );
       } else {
         const errorData = await response.json().catch(() => ({}));
-        Alert.alert('Eroare', errorData.message || response.statusText);
+        Alert.alert('Error', 'The code you entered is incorrect or has expired. Please check your email for a new code.');
       }
     } catch (error) {
-      Alert.alert('Eroare', String(error));
+      Alert.alert('Errror', String(error));
     }
   };
 

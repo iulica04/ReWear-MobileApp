@@ -36,6 +36,7 @@ export default function TabLayout() {
         }}
       />
 
+
       <Tabs.Screen
         name="add"
         
@@ -74,6 +75,20 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
+        name="eco"
+        options={{
+          href: null,
+        }}
+      />
+
+      <Tabs.Screen
+        name="aiStyling/reviewOutfit"
+        options={{
+          href: null,
+        }}
+      />
+
+      <Tabs.Screen
         name="closet/addOutfits"
         options={{
           href: null,
@@ -96,6 +111,16 @@ export default function TabLayout() {
           title: 'Add Items',
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="add-circle-outline" color={color} size={30} />
+          ),
+        }}
+      />
+
+      <Tabs.Screen
+        name="aiStyling"
+        options={{
+          title: 'AI Stylist',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialCommunityIcons name="robot" color={color} size={28} />
           ),
         }}
       />

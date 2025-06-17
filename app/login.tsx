@@ -126,7 +126,7 @@ export default function LoginScreen() {
       style={styles.container}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-      <ScrollView contentContainerStyle={styles.wrapper} keyboardShouldPersistTaps="handled">
+      <ScrollView contentContainerStyle={styles.wrapper} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
         {/* Video header */}
         <View style={styles.videoContainer}>
           <Video

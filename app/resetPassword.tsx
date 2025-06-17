@@ -43,8 +43,8 @@ export default function ResetPasswordScreen() {
       setPasswordError('Password must be between 6 and 50 characters.');
       return false;
     }
-    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,}$/.test(password)) {
-      setPasswordError('Password must contain at least one uppercase letter, one lowercase letter, and one number.');
+    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z\d]).{6,}$/.test(password)) {
+      setPasswordError('Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.');
       return false;
     }
     setPasswordError('');
@@ -66,7 +66,7 @@ export default function ResetPasswordScreen() {
     if (!validPassword || !validConfirm) return;
 
     if (!email) {
-      Alert.alert('Eroare', 'Emailul lipsește.');
+      Alert.alert('Error', 'Emailul lipsește.');
       return;
     }
 
@@ -81,16 +81,16 @@ export default function ResetPasswordScreen() {
 
       if (response.ok) {
         Alert.alert(
-          'Parolă resetată!',
-          'Parola a fost schimbată cu succes.',
+          'Password reset!',
+          'Your password has been changed successfully.',
           [{ text: 'OK', onPress: () => router.push('/login') }]
         );
       } else {
         const errorData = await response.json().catch(() => ({}));
-        Alert.alert('Eroare', errorData.message || response.statusText);
+        Alert.alert('Error', errorData.message || response.statusText);
       }
     } catch (error) {
-      Alert.alert('Eroare', String(error));
+      Alert.alert('Error', String(error));
     }
   };
 

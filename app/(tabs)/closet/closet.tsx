@@ -9,6 +9,8 @@ import * as ImagePicker from 'expo-image-picker';
 import { KeyboardAvoidingView, Platform } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons'; 
 import { Alert } from 'react-native';
+import {useRouter } from 'expo-router';
+
 
 const CARD_WIDTH = (Dimensions.get('window').width - 18 * 2 - 16) / 2;
 
@@ -154,6 +156,7 @@ function ClosetHeader({
           </Text>
         </View>
       </View>
+      
       {/* Tabs */}
       <View style={styles.tabsRow}>
         <TouchableOpacity
@@ -191,6 +194,8 @@ export default function ClosetScreen() {
     lat: 47.1,
     lon: 27.6,
   });
+  const router = useRouter();
+
 
   const [outfitSortOrder, setOutfitSortOrder] = useState<'desc' | 'asc'>('desc');
   function getSortedOutfits() {
@@ -747,6 +752,25 @@ const handleApplyFilter = async () => {
     />
   );
 
+  const handleMarkAsSold = async () => {
+    if (!detailItem) return;
+    try {
+      const jwtToken = await AsyncStorage.getItem('jwtToken');
+      if (!jwtToken) return;
+      await fetch(`${API_BASE_URL}/api/ClothingItem/mark-as-sold/${detailItem.id}`, {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${jwtToken}`,
+        },
+      });
+      Alert.alert('Success', 'Articolul a fost marcat ca vândut!');
+      setDetailModal(false);
+      fetchClothes(1, false); // reîncarcă lista
+    } catch (e) {
+      Alert.alert('Eroare', 'Nu s-a putut marca articolul ca vândut.');
+    }
+  };
+
   // Open edit mode
   const handleEdit = useCallback(() => {
   setEditData({ ...detailItem });
@@ -875,8 +899,10 @@ const confirmDelete = () => {
       setLocationModal={setLocationModal}
       setShowHelpModal={setShowHelpModal}
     />
+    
       {activeTab === 'closet' && (
         <>
+        
         <FlatList
         initialNumToRender={6}
           windowSize={7}
@@ -890,6 +916,39 @@ const confirmDelete = () => {
             <FlipCard item={item} onLongPress={handleLongPressCard} />
           )}
           ListHeaderComponent={
+           <> 
+           <View style={{
+            marginHorizontal: 2,
+            marginBottom: 16,
+            marginTop: 10,
+            backgroundColor: '#f8f4f1',
+            borderRadius: 14,
+            padding: 16,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}>
+            <TouchableOpacity
+              style={{
+                backgroundColor: '#8c916C',
+                borderRadius: 8,
+                padding: 10,
+                marginRight: 12,
+              }}
+             onPress={() => router.push('/eco/ecoImpact')}
+            >
+              <Ionicons name="leaf-outline" size={24} color="#fff" /> 
+            </TouchableOpacity>
+            <View style={{ flex: 1 }}>
+              <Text style={{ color: '#6b5853', fontWeight: 'bold', fontSize: 16 }}>
+                Eco impact of your closet
+              </Text>
+              <Text style={{ color: '#a68b7b', fontSize: 13, marginTop: 2, textAlign: 'justify' }}>
+                Discover how your clothes affect the planet and get eco-friendly tips.
+              </Text>
+            </View>
+            
+          </View>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 8, marginBottom: 12 }}>
             {/* Sortare după număr de purtări */}
             <TouchableOpacity
@@ -908,6 +967,7 @@ const confirmDelete = () => {
               <Ionicons name="filter-outline" size={22} color="#6b5853" />
             </TouchableOpacity>
           </View>
+          </>
         }
           ListEmptyComponent={
             clothesLoading ? (
@@ -1427,8 +1487,18 @@ const confirmDelete = () => {
           contentContainerStyle={{ alignItems: 'stretch', paddingBottom: 24, width: '100%' }}
           keyboardShouldPersistTaps="handled"
           showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
         >
           <View style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', marginBottom: 8 }}>
+            {detailItem && !detailItem.clothingItems && (
+            <TouchableOpacity style={{ marginRight: 12 }} onPress={handleMarkAsSold}>
+              <Image
+                source={require('../../../assets/images/sell.png')}
+                style={{ width: 26, height: 26, tintColor: '#6b5853' }}
+                resizeMode="contain"
+              />
+            </TouchableOpacity>
+          )}
             {!editMode && (
               <TouchableOpacity style={{ marginRight: 12 }} onPress={handleEdit}>
                 <Ionicons name="create-outline" size={26} color="#6b5853" />
@@ -2205,6 +2275,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   tabsRow: {
+    marginTop: -20,
     flexDirection: 'row',
     marginHorizontal: 18,
     marginBottom: 0,

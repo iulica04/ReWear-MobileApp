@@ -248,10 +248,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#fff',
     paddingVertical: 8,
-    paddingHorizontal: 16,
+    paddingHorizontal: 25,
     borderBottomWidth: 1,
     borderBottomColor: '#ece4df',
     justifyContent: 'space-between',
+    marginHorizontal:-20,
   },
   deleteButton: {
     flexDirection: 'row',

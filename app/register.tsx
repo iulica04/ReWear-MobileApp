@@ -183,7 +183,7 @@ export default function RegisterScreen() {
     } else if (password.length < 6 || password.length > 50) {
       setPasswordError('Password must be between 6 and 50 characters.');
       valid = false;
-    } else if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,}$/.test(password)) {
+    } else if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,}$/.test(password)) {
       setPasswordError('Password must contain at least one uppercase letter, one lowercase letter, and one number.');
       valid = false;
     } else {
@@ -220,8 +220,8 @@ export default function RegisterScreen() {
 
       if (response.ok) {
         Alert.alert(
-          'Cont creat cu succes!',
-          'Bine ai venit în ReWear!',
+          'Account created successfully!',
+          'Welcome to ReWear!',
           [{ text: 'OK', onPress: () => router.push('/login') }]
         );
       } else {

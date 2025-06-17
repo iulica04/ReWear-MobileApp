@@ -27,6 +27,7 @@ export default function AddClothesScreen() {
   const [loading, setLoading] = useState(false);
   const [addLoading, setAddLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
+  const [weight, setWeight] = useState<number | null>(null); // <-- adaugă pentru weight
   const [modalVisible, setModalVisible] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -117,12 +118,20 @@ export default function AddClothesScreen() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ImageFront: images[0] || "",
-          ImageBack: images[1] || "",
+          ImageBack: images[1] || null,
         }),
       });
       if (response.ok) {
         const data = await response.json();
+        console.log('Analyze response:', data);
         setResult(data);
+        setWeight(
+          typeof data.weight === 'number'
+            ? data.weight
+            : data.weight
+            ? parseFloat(data.weight)
+            : null
+        );
         setEditFields({
           name:
             data.name === 'unknown' || data.name === null
@@ -206,7 +215,8 @@ export default function AddClothesScreen() {
           printDescription: editFields?.printDescription || "",
           description: editFields?.description || "",
           imageFront: images[0] ? String(images[0]) : "",
-          imageBack: images[1] ? String(images[1]) : "",
+          imageBack: images[1] ? String(images[1]) : null,
+          weight: weight,
         }),
       });
       if (response.ok) {
