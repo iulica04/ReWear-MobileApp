@@ -5,6 +5,7 @@ import { useNavigation } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker';
 import * as Location from 'expo-location';
 import { API_BASE_URL } from '../../config';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function ReviewOutfitScreen() {
   const navigation = useNavigation();
@@ -86,10 +87,13 @@ export default function ReviewOutfitScreen() {
       }
       setLocation(loc);
     }
+    const jwtToken = await AsyncStorage.getItem('jwtToken');
     try {
       const res = await fetch(`${API_BASE_URL}/api/Outfit/review-outfit`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json'
+          , Authorization: `Bearer ${jwtToken}`  // Include JWT token for authentication
+         },
         body: JSON.stringify({
           lon: String(loc.lon),
           lat: String(loc.lat),

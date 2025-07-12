@@ -40,10 +40,13 @@ export default function OutfitDetails() {
   const fetchSimilar = async (pageNum = 1) => {
     if (!hasMore) return;
     try {
+      const jwtToken = await AsyncStorage.getItem('jwtToken');
       const url = `${API_BASE_URL}/api/Outfit/similar?Id=${parsedOutfit.id}&Page=${pageNum}&PageSize=${PAGE_SIZE}`;
       const res = await fetch(url, {
         method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json'
+          , Authorization: `Bearer ${jwtToken}`  // Include JWT token for authentication
+         },
       });
       const data = await res.json();
       if (data && Array.isArray(data.data)) {

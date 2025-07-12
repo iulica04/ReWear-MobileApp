@@ -158,9 +158,10 @@ export default function ImpactRaportScreen() {
       ) {
         setLoadingEquivalents(true);
         try {
+          const jwtToken = await AsyncStorage.getItem('jwtToken');
           const res = await fetch(
             `${API_BASE_URL}/api/ClothingItem/get-carbon-impact-equivalents?carbonFootprint=${carbonData.totalCarbonFootprint}`,
-            { method: 'GET' }
+            { method: 'GET', headers: { Authorization: `Bearer ${jwtToken}` } }
           );
           const data = await res.json();
           setImpactEquivalents(data);

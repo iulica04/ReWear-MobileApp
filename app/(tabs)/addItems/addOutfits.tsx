@@ -168,11 +168,14 @@ export default function AddOutfitsScreen() {
       Alert.alert('Photo required', 'Please add at least a front photo.');
       return;
     }
+    const jwtToken = await AsyncStorage.getItem('jwtToken');
     setLoading(true);
     try {
       const response = await fetch(`${API_BASE_URL}/api/Outfit/analyze-items`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json',
+          Authorization: `Bearer ${jwtToken}`
+         },
         body: JSON.stringify({
           ImageFront: images[0],
         }),
@@ -257,6 +260,7 @@ export default function AddOutfitsScreen() {
     const results: any[][] = [];
     const selected: (any | null)[] = [];
     let userId;
+    const jwtToken = await AsyncStorage.getItem('jwtToken');
     try {
       userId = await AsyncStorage.getItem('userId');
     } catch {}
@@ -266,7 +270,9 @@ export default function AddOutfitsScreen() {
       try {
         const response = await fetch(`${API_BASE_URL}/api/Outfit/match-items`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: { 'Content-Type': 'application/json',
+            Authorization: `Bearer ${jwtToken}`
+           },
           body: JSON.stringify(itemWithUser),
         });
         if (response.ok) {
@@ -293,10 +299,13 @@ export default function AddOutfitsScreen() {
     setMatchingModalVisible(false);
     setInterModalLoading(true);
     setFinalLoading(true);
+    const jwtToken = await AsyncStorage.getItem('jwtToken');
     try {
       const analyzeRes = await fetch(`${API_BASE_URL}/api/Outfit/analyze-outfit`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${jwtToken}`},
         body: JSON.stringify({ imageFront: images[0] }),
       });
       if (!analyzeRes.ok) throw new Error('Failed to analyze outfit');
@@ -342,9 +351,13 @@ export default function AddOutfitsScreen() {
         imageFront: images[0],
       };
 
+      const jwtToken = await AsyncStorage.getItem('jwtToken');
       const res = await fetch(`${API_BASE_URL}/api/Outfit/create-outfit`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json' 
+          , Authorization: `Bearer ${jwtToken}`
+        },
         body: JSON.stringify(payload),
       });
 

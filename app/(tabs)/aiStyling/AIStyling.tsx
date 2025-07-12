@@ -26,13 +26,7 @@ export default function AIStylingScreen() {
         />
       </View>
       <View style={styles.fieldsContainer}>
-        <TouchableOpacity style={styles.field} onPress={() => router.push('../AIStyling/generateOutfit')}>
-          <View>
-            <Text style={styles.fieldLabel}>Generate Outfit</Text>
-            <Text style={styles.fieldDesc}>Generate an outfit with the help of AI</Text>
-          </View>
-          <MaterialIcons name="chevron-right" size={28} color="#888" />
-        </TouchableOpacity>
+       
         <TouchableOpacity style={styles.field} onPress={() => router.push('/(tabs)/aiStyling/reviewOutfit')}>
           <View>
             <Text style={styles.fieldLabel}>Analyze Outfit</Text>
@@ -78,6 +72,7 @@ const styles = StyleSheet.create({
     marginTop: -24,
   },
   imageWrapper: {
+    marginTop: 20,
     width: '90%',
     height: 320,
     borderRadius: 30,
@@ -102,6 +97,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    marginTop: 40,
   },
   fieldLabel: {
     fontSize: 18,

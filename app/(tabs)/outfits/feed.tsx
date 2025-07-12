@@ -29,8 +29,13 @@ export default function FeedScreen() {
 
   const fetchOutfits = useCallback(async (pageNum = 1) => {
     setLoading(true);
+    const jwtToken = await AsyncStorage.getItem('jwtToken');
     try {
-      const res = await fetch(`${API_BASE_URL}/api/Outfit/paginated?page=${pageNum}&pageSize=${PAGE_SIZE}`);
+      const res = await fetch(`${API_BASE_URL}/api/Outfit/paginated?page=${pageNum}&pageSize=${PAGE_SIZE}`,{
+        headers: {
+          'Authorization': `Bearer ${jwtToken}`,
+        },
+      });
       const data = await res.json();
       if (data && Array.isArray(data.data)) {
         data.data.sort((a: any, b: any) => {

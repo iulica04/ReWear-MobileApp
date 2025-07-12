@@ -111,11 +111,14 @@ export default function AddClothesScreen() {
       Alert.alert('Photo required', 'Please add at least a front photo.');
       return;
     }
+     const jwtToken = await AsyncStorage.getItem('jwtToken');
     setLoading(true);
     try {
       const response = await fetch(`${API_BASE_URL}/api/ClothingItem/analyze`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json' 
+          , Authorization: `Bearer ${jwtToken}`},
         body: JSON.stringify({
           ImageFront: images[0] || "",
           ImageBack: images[1] || null,
@@ -200,9 +203,13 @@ export default function AddClothesScreen() {
         setAddLoading(false);
         return;
       }
+      const jwtToken = await AsyncStorage.getItem('jwtToken');
       const response = await fetch(`${API_BASE_URL}/api/ClothingItem`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${jwtToken}`,
+        },
         body: JSON.stringify({
           userId,
           name: editFields?.name || "",
