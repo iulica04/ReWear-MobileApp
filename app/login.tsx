@@ -1,4 +1,5 @@
 import { API_BASE_URL } from './config'; // ajustează calea dacă e nevoie
+import { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } from './appSetings'; 
 import React, { useState, useLayoutEffect  } from 'react';
 import {
   View,
@@ -30,8 +31,6 @@ export default function LoginScreen() {
   const [passwordError, setPasswordError] = useState('');
   const [backendError, setBackendError] = useState(''); // <-- adăugat
 
-  const GOOGLE_CLIENT_ID = '1021086131357-dcmqujb49f6s2ofkd8vbiq1pao0p5d9d.apps.googleusercontent.com'; // același ca în register
-  const GOOGLE_CLIENT_SECRET = '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'; // același ca în register
   const redirectUri =
     Constants.appOwnership === 'expo'
       ? 'https://auth.expo.io/@iulica/rewear'

@@ -1,4 +1,5 @@
 import { API_BASE_URL } from './config'; 
+import { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET } from './appSetings';
 import React, { useState, useLayoutEffect, useEffect } from 'react';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Alert } from 'react-native';
@@ -27,8 +28,6 @@ WebBrowser.maybeCompleteAuthSession();
 export default function RegisterScreen() {
   const router = useRouter();
   const navigation = useNavigation();
-  const GOOGLE_CLIENT_ID = '1021086131357-dcmqujb49f6s2ofkd8vbiq1pao0p5d9d.apps.googleusercontent.com'; // înlocuiește cu clientId-ul tău
-  const GOOGLE_CLIENT_SECRET = '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'; // înlocuiește cu clientSecret-ul tău
   const redirectUri = 
     Constants.appOwnership === 'expo'
       ? 'https://auth.expo.io/@iulica/rewear'
